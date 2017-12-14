@@ -20,12 +20,11 @@ def build(ctx):
         source=['requirements.txt', 'serverless.yml', 'credentials']
             + ctx.path.ant_glob(incl='bot/**/*', excl=EXCLUDE),
         target='{pkg}.zip'.format(pkg=pkg),
-        depends_on=['docker image'],
         name='serverless package')
 
     ctx(rule='docker-compose run --rm default serverless deploy --package {out} --verbose'.format(out=out),
         source='{pkg}.zip'.format(pkg=pkg),
-        depends_on=['docker image', 'serverless package'],
+        depends_on=['serverless package'],
         name='serverless deploy')
 
 
