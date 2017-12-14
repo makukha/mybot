@@ -4,8 +4,7 @@ services:
 
   default:
 
-    build: .
-    image: mybot-dev
+    image: makukha/mybot-dev
     volumes:
       - .:/code
       - .:/root/.aws
