@@ -1,0 +1,87 @@
+service: mybot
+
+provider:
+  name: aws
+  runtime: python3.6
+
+  stage: dev
+  region: us-east-1
+  profile: serverless-mybot
+
+  memorySize: 128
+  cfLogs: true
+
+custom:
+
+  pythonRequirements:
+    zip: false
+    cleanupZipHelper: true
+    dockerizePip: false
+
+
+# you can add statements to the Lambda function's IAM Role here
+#  iamRoleStatements:
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:ListBucket"
+#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:PutObject"
+#      Resource:
+#        Fn::Join:
+#          - ""
+#          - - "arn:aws:s3:::"
+#            - "Ref" : "ServerlessDeploymentBucket"
+#            - "/*"
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+package:
+  exclude:
+    - .idea/**
+    - .lock-waf*
+    - .waf*/**
+    - build/**
+    - waf
+
+functions:
+
+  default:
+    handler: bot.handle_telegram
+    events:
+      - http:
+          path: ${self:service}/{telegram_bot_token}
+          method: post
+    timeout: 30
+
+resources:
+
+  Resources:
+
+    DynamoDbTableChats:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: chatid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: chatid
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+
+  Outputs:
+
+    DynamoDbTableChats:
+      Value:
+        Ref: DynamoDbTableChats
+
+plugins:
+  - serverless-python-requirements

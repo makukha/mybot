@@ -1,0 +1,6 @@
+/.idea/
+/.lock-waf*
+/.waf*/
+
+/build/
+/credentials

@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+
+  default:
+
+    build: .
+    image: mybot-dev
+    volumes:
+      - .:/code
+      - .:/root/.aws
+    working_dir: /code
+    environment:
+     - SLS_DEBUG=*
